@@ -1,0 +1,137 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model Block {
+  id        String   @id @default(uuid())
+  name      String
+  floors    Floor[]
+  rooms     Room[]
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("blocks")
+}
+
+model Floor {
+  id        String   @id @default(uuid())
+  name      String
+  blockId   String
+  block     Block    @relation(fields: [blockId], references: [id], onDelete: Cascade)
+  rooms     Room[]
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("floors")
+}
+
+model Room {
+  id              String   @id @default(uuid())
+  name            String
+  floorId         String
+  floor           Floor    @relation(fields: [floorId], references: [id], onDelete: Cascade)
+  blockId         String
+  block           Block    @relation(fields: [blockId], references: [id], onDelete: Cascade)
+  occupancyStatus String   @default("INHOUSE")
+  minibarStatus   String   @default("PENDING")
+  note            String?
+  isActive        Boolean  @default(true)
+  minibarLogs     MinibarLog[]
+  statusHistories RoomStatusHistory[]
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  @@map("rooms")
+}
+
+model User {
+  id            String             @id @default(uuid())
+  firstName     String
+  lastName      String
+  username      String             @unique
+  password      String
+  role          String
+  isActive      Boolean            @default(true)
+  minibarLogs   MinibarLog[]
+  statusChanges RoomStatusHistory[]
+  shifts        Shift[]
+  createdAt     DateTime           @default(now())
+  updatedAt     DateTime           @updatedAt
+
+  @@map("users")
+}
+
+model Product {
+  id            String       @id @default(uuid())
+  name          String
+  price         Float
+  stock         Int          @default(0)
+  minStockLevel Int          @default(5)
+  isActive      Boolean      @default(true)
+  minibarLogs   MinibarLog[]
+  createdAt     DateTime     @default(now())
+  updatedAt     DateTime     @updatedAt
+
+  @@map("products")
+}
+
+model Shift {
+  id        String   @id @default(uuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  date      DateTime
+  startTime String
+  endTime   String
+  note      String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("shifts")
+}
+
+model MinibarLog {
+  id          String   @id @default(uuid())
+  roomId      String
+  room        Room     @relation(fields: [roomId], references: [id], onDelete: Cascade)
+  productId   String
+  product     Product  @relation(fields: [productId], references: [id])
+  quantity    Int
+  personnelId String
+  personnel   User     @relation(fields: [personnelId], references: [id])
+  performedAt DateTime @default(now())
+  archived    Boolean  @default(false)
+  createdAt   DateTime @default(now())
+
+  @@map("minibar_logs")
+}
+
+model RoomStatusHistory {
+  id              String   @id @default(uuid())
+  roomId          String
+  room            Room     @relation(fields: [roomId], references: [id], onDelete: Cascade)
+  oldStatus       String?
+  newStatus       String
+  occupancyStatus String?
+  note            String?
+  changedById     String
+  changedBy       User     @relation(fields: [changedById], references: [id])
+  archived        Boolean  @default(false)
+  createdAt       DateTime @default(now())
+
+  @@map("room_status_histories")
+}
+
+model DaySnapshot {
+  id        String   @id @default(uuid())
+  label     String
+  date      DateTime
+  data      String
+  createdAt DateTime @default(now())
+
+  @@map("day_snapshots")
+}
