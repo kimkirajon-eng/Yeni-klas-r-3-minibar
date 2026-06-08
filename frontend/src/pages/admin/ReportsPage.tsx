@@ -12,16 +12,11 @@ const ReportsPage: React.FC = () => {
   useEffect(() => { api.blocks.getAll().then(setBlocks); }, []);
   useEffect(() => { if (blockId) api.floors.getByBlock(blockId).then(setFloors); else setFloors([]); }, [blockId]);
 
-  const getUrl = (ext: string) => {
-    const token = localStorage.getItem('token');
-    const params = new URLSearchParams();
-    params.set('token', token || '');
-    if (blockId) params.set('blockId', blockId);
-    if (floorId) params.set('floorId', floorId);
-    return `/api/reports/${ext}?${params.toString()}`;
+  const download = (ext: string) => {
+    const block = showFilters ? blockId : undefined;
+    const floor = showFilters ? floorId : undefined;
+    window.open(ext === 'excel' ? api.reports.excelUrl(block, floor) : api.reports.pdfUrl(block, floor), '_blank');
   };
-
-  const download = (ext: string) => window.open(getUrl(ext), '_blank');
 
   return (
     <div>

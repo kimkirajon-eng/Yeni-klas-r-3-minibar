@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useI18n } from '../../store/I18nContext';
+import { api } from '../../services/api';
 import { Download, Database, FileCode, Shield } from 'lucide-react';
 
 const BackupPage: React.FC = () => {
@@ -8,9 +9,7 @@ const BackupPage: React.FC = () => {
 
   const handleExport = async (type: 'json' | 'sqlite') => {
     setExporting(type);
-    const token = localStorage.getItem('token');
-    const url = `/api/backup/${type}?token=${token}`;
-    window.open(url, '_blank');
+    window.open(type === 'json' ? api.backup.jsonUrl() : api.backup.sqliteUrl(), '_blank');
     setTimeout(() => setExporting(null), 2000);
   };
 

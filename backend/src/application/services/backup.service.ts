@@ -37,21 +37,6 @@ export class BackupService {
   }
 
   async exportAsSqlite(res: Response): Promise<void> {
-    const fs = require('fs');
-    const path = require('path');
-    const dbPath = path.resolve(process.cwd(), 'prisma', 'dev.db');
-
-    if (!fs.existsSync(dbPath)) {
-      res.status(404).json({ message: 'Veritabanı dosyası bulunamadı' });
-      return;
-    }
-
-    const stat = fs.statSync(dbPath);
-    res.setHeader('Content-Type', 'application/octet-stream');
-    res.setHeader('Content-Disposition', `attachment; filename=minibar-backup-${new Date().toISOString().split('T')[0]}.db`);
-    res.setHeader('Content-Length', stat.size);
-
-    const stream = fs.createReadStream(dbPath);
-    stream.pipe(res);
+    res.status(400).json({ message: 'SQLite export yalnızca geliştirme ortamında kullanılabilir. PostgreSQL için JSON export kullanın.' });
   }
 }

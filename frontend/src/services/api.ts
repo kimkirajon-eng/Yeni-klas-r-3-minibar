@@ -1,6 +1,15 @@
 import { LoginResponse } from '../types';
 
-const API_BASE = '/api';
+const API_BASE = import.meta.env.VITE_API_URL ? `${import.meta.env.VITE_API_URL}/api` : '/api';
+
+function buildUrl(path: string, params?: Record<string, string | undefined>): string {
+  const token = localStorage.getItem('token');
+  const qp = new URLSearchParams();
+  if (token) qp.set('token', token);
+  if (params) Object.entries(params).forEach(([k, v]) => { if (v) qp.set(k, v); });
+  const qs = qp.toString();
+  return `${API_BASE}${path}${qs ? `?${qs}` : ''}`;
+}
 
 async function request<T>(endpoint: string, options: RequestInit = {}): Promise<T> {
   const token = localStorage.getItem('token');
@@ -140,8 +149,8 @@ export const api = {
   },
 
   reports: {
-    excel: () => `${API_BASE}/reports/excel`,
-    pdf: () => `${API_BASE}/reports/pdf`,
+    excelUrl: (blockId?: string, floorId?: string) => buildUrl('/reports/excel', { blockId, floorId }),
+    pdfUrl: (blockId?: string, floorId?: string) => buildUrl('/reports/pdf', { blockId, floorId }),
     performance: () => request<any[]>('/reports/performance'),
     productRevenue: (start?: string, end?: string) => {
       const params = new URLSearchParams();
@@ -175,8 +184,8 @@ export const api = {
   },
 
   backup: {
-    json: () => `${API_BASE}/backup/json`,
-    sqlite: () => `${API_BASE}/backup/sqlite`,
+    jsonUrl: () => buildUrl('/backup/json'),
+    sqliteUrl: () => buildUrl('/backup/sqlite'),
   },
 
   snapshots: {

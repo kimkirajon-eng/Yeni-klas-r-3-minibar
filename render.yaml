@@ -1,0 +1,31 @@
+services:
+  - type: web
+    name: hotel-minibar
+    env: node
+    region: frankfurt
+    buildCommand: cd frontend && npm ci && npm run build && cd ../backend && npm ci
+    startCommand: cd backend && npx prisma generate && npx prisma migrate deploy && npx ts-node -T prisma/seed.ts && npx ts-node -T src/app.ts
+    healthCheckPath: /api/health
+    envVars:
+      - key: NODE_VERSION
+        value: 20
+      - key: NODE_ENV
+        value: production
+      - key: DATABASE_URL
+        fromDatabase:
+          name: hotel-minibar-db
+          property: connectionString
+      - key: JWT_SECRET
+        generateValue: true
+      - key: JWT_EXPIRES_IN
+        value: 24h
+      - key: CORS_ORIGIN
+        value: auto
+      - key: PORT
+        value: 10000
+
+databases:
+  - name: hotel-minibar-db
+    region: frankfurt
+    plan: free
+    databaseName: hotel_minibar

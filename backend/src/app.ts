@@ -1,5 +1,6 @@
 import express from 'express';
 import cors from 'cors';
+import path from 'path';
 import { createServer } from 'http';
 import { config } from './config';
 import { prisma } from './infrastructure/database/prisma/client';
@@ -48,6 +49,14 @@ app.use('/api/reports', reportRoutes);
 app.use('/api/shifts', shiftRoutes);
 app.use('/api/backup', backupRoutes);
 app.use('/api/snapshots', snapshotRoutes);
+
+/* Serve frontend build */
+const frontendDist = path.resolve(__dirname, '../../frontend/dist');
+app.use(express.static(frontendDist));
+app.get('*', (_req, res, next) => {
+  if (_req.path.startsWith('/api/')) return next();
+  res.sendFile(path.join(frontendDist, 'index.html'));
+});
 
 app.use(errorHandler);
 

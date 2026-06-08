@@ -4,7 +4,7 @@ import PDFDocument from 'pdfkit';
 import { Response } from 'express';
 import path from 'path';
 
-const FONT_DIR = path.join(__dirname, '..', '..', 'infrastructure', 'reporting', 'fonts');
+const FONT_DIR = path.resolve(process.cwd(), 'src', 'infrastructure', 'reporting', 'fonts');
 
 const BRAND_PRIMARY = '1a73e8';
 const BRAND_DARK = '1a1f36';

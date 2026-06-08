@@ -55,21 +55,11 @@ const DashboardPage: React.FC = () => {
   }, [filterBlock]);
 
   const handleExportExcel = (filtered = false) => {
-    const token = localStorage.getItem('token');
-    const params = new URLSearchParams();
-    if (filtered && filterBlock) params.set('blockId', filterBlock);
-    if (filtered && filterFloor) params.set('floorId', filterFloor);
-    const qs = params.toString();
-    window.open(`/api/reports/excel?token=${token}${qs ? `&${qs}` : ''}`, '_blank');
+    window.open(api.reports.excelUrl(filtered ? filterBlock : undefined, filtered ? filterFloor : undefined), '_blank');
   };
 
   const handleExportPdf = (filtered = false) => {
-    const token = localStorage.getItem('token');
-    const params = new URLSearchParams();
-    if (filtered && filterBlock) params.set('blockId', filterBlock);
-    if (filtered && filterFloor) params.set('floorId', filterFloor);
-    const qs = params.toString();
-    window.open(`/api/reports/pdf?token=${token}${qs ? `&${qs}` : ''}`, '_blank');
+    window.open(api.reports.pdfUrl(filtered ? filterBlock : undefined, filtered ? filterFloor : undefined), '_blank');
   };
 
   if (loading) return <div className="loading-screen"><div className="spinner" /></div>;
